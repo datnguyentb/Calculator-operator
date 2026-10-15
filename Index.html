@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Lượng Sử Dụng Ca Làm</title>
+    <!-- Tailwind CSS CDN cho giao diện sáng, đẹp, chuẩn mobile -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col items-center justify-start p-4 font-sans">
+
+    <!-- Khung ứng dụng -->
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-5 border border-slate-200 mt-2 mb-6">
+        
+        <!-- Tiêu đề -->
+        <div class="text-center mb-6">
+            <h1 class="text-xl font-bold text-indigo-600">📊 Tính Lượng Sử Dụng Ca</h1>
+            <p class="text-xs text-slate-500 mt-1">Line Stax, Line Poca & Kiểm tra chênh lệch Oil</p>
+        </div>
+
+        <!-- Form nhập liệu -->
+        <div class="space-y-4">
+            
+            <!-- Oil Stax -->
+            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">1. Oil Stax</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="stat_oil_stax" placeholder="Stat (Đầu)" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500">
+                    <input type="number" id="end_oil_stax" placeholder="End (Cuối)" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500">
+                </div>
+            </div>
+
+            <!-- Oil Poca -->
+            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">2. Oil Poca</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="start_oil_pb" placeholder="Start (Đầu)" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500">
+                    <input type="number" id="end_oil_pb" placeholder="End (Cuối)" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500">
+                </div>
+            </div>
+
+            <!-- Oil All (Start - End) -->
+            <div class="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-amber-800 mb-2">3. Oil Tổng (All) <span class="text-[10px] lowercase text-amber-600 font-normal">(Start - End)</span></label>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="start_oil_all" placeholder="Start (Đầu)" class="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-amber-500">
+                    <input type="number" id="end_oil_all" placeholder="End (Cuối)" class="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-amber-500">
+                </div>
+            </div>
+
+            <!-- Steam -->
+            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">4. Steam</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="start_steam" placeholder="Start (Đầu)" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500">
+                    <input type="number" id="end_steam" placeholder="End (Cuối)" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Nút bấm -->
+        <div class="flex gap-2 mt-6">
+            <button onclick="tinhToan()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition text-white font-medium py-3 rounded-xl shadow-md text-sm">
+                Tính & Kiểm Tra Lệch
+            </button>
+            <button onclick="lamMoi()" class="bg-slate-200 hover:bg-slate-300 active:scale-95 transition text-slate-700 px-4 py-3 rounded-xl text-sm font-medium">
+                Xóa
+            </button>
+        </div>
+
+        <!-- Khung kết quả chi tiết & Phân tích chênh lệch -->
+        <div id="resultBox" class="mt-6 hidden bg-indigo-50/50 border border-indigo-200 rounded-2xl p-4 transition-all">
+            <h2 class="text-xs font-bold text-indigo-700 uppercase tracking-wider mb-3">📋 Bảng Chi Tiết & Chênh Lệch:</h2>
+            
+            <div class="space-y-2.5 text-xs">
+                <!-- Stax Details -->
+                <div class="bg-white p-2.5 rounded-xl border border-indigo-100 flex justify-between items-center shadow-xs">
+                    <div>
+                        <span class="font-semibold text-slate-700">Oil Stax:</span>
+                        <div class="text-[11px] text-slate-400 mt-0.5">Stat: <span id="val_stat_stax" class="text-slate-600 font-medium">0</span> → End: <span id="val_end_stax" class="text-slate-600 font-medium">0</span></div>
+                    </div>
+                    <span id="res_stax" class="font-bold text-indigo-600 text-sm">0</span>
+                </div>
+
+                <!-- Poca Details -->
+                <div class="bg-white p-2.5 rounded-xl border border-indigo-100 flex justify-between items-center shadow-xs">
+                    <div>
+                        <span class="font-semibold text-slate-700">Oil Poca:</span>
+                        <div class="text-[11px] text-slate-400 mt-0.5">Start: <span id="val_start_pb" class="text-slate-600 font-medium">0</span> → End: <span id="val_end_pb" class="text-slate-600 font-medium">0</span></div>
+                    </div>
+                    <span id="res_pb" class="font-bold text-indigo-600 text-sm">0</span>
+                </div>
+
+                <!-- All Details -->
+                <div class="bg-amber-50/80 p-2.5 rounded-xl border border-amber-200 flex justify-between items-center shadow-xs">
+                    <div>
+                        <span class="font-semibold text-amber-800">Oil Tổng (All):</span>
+                        <div class="text-[11px] text-amber-600 mt-0.5">Start: <span id="val_start_all" class="font-medium">0</span> → End: <span id="val_end_all" class="font-medium">0</span></div>
+                    </div>
+                    <span id="res_all" class="font-bold text-amber-700 text-sm">0</span>
+                </div>
+
+                <!-- Steam Details -->
+                <div class="bg-white p-2.5 rounded-xl border border-indigo-100 flex justify-between items-center shadow-xs">
+                    <div>
+                        <span class="font-semibold text-slate-700">Steam:</span>
+                        <div class="text-[11px] text-slate-400 mt-0.5">Start: <span id="val_start_stm" class="text-slate-600 font-medium">0</span> → End: <span id="val_end_stm" class="text-slate-600 font-medium">0</span></div>
+                    </div>
+                    <span id="res_steam" class="font-bold text-indigo-600 text-sm">0</span>
+                </div>
+
+                <!-- Khung phân tích chênh lệch đặc biệt -->
+                <div class="mt-3 pt-3 border-t border-indigo-200 bg-white p-3 rounded-xl border shadow-xs">
+                    <div class="text-slate-700 font-semibold mb-1">🔍 Kiểm tra chênh lệch Oil ngoài:</div>
+                    <div class="text-[11px] text-slate-500 mb-1">
+                        Tổng 2 line (Stax + Poca) = <span id="sum_2_lines" class="font-medium text-indigo-600">0</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-700 font-medium">Lệch (Oil Tổng - 2 Line):</span>
+                        <span id="res_chenh_lech" class="font-bold text-sm">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript xử lý -->
+    <script>
+        function layGiaTri(id) {
+            let val = document.getElementById(id).value;
+            return val === "" ? 0 : parseFloat(val);
+        }
+
+        function tinhToan() {
+            let stat_stax = layGiaTri('stat_oil_stax');
+            let end_stax = layGiaTri('end_oil_stax');
+
+            let start_pb = layGiaTri('start_oil_pb');
+            let end_pb = layGiaTri('end_oil_pb');
+
+            let start_all = layGiaTri('start_oil_all');
+            let end_all = layGiaTri('end_oil_all');
+
+            let start_stm = layGiaTri('start_steam');
+            let end_stm = layGiaTri('end_steam');
+
+            // Tính toán lượng sử dụng
+            let use_stax = end_stax - stat_stax;
+            let use_pb = end_pb - start_pb;
+            let use_all = start_all - end_all; // Oil All lấy Start - End
+            let use_stm = end_stm - start_stm;
+
+            // Tổng 2 line Stax + Poca
+            let sum_2_lines = use_stax + use_pb;
+            // Độ lệch giữa Oil Tổng và tổng 2 line
+            let chenh_lech = use_all - sum_2_lines;
+
+            // Đổ dữ liệu vào bảng hiển thị chi tiết
+            document.getElementById('val_stat_stax').innerText = stat_stax;
+            document.getElementById('val_end_stax').innerText = end_stax;
+            document.getElementById('res_stax').innerText = use_stax.toFixed(2);
+
+            document.getElementById('val_start_pb').innerText = start_pb;
+            document.getElementById('val_end_pb').innerText = end_pb;
+            document.getElementById('res_pb').innerText = use_pb.toFixed(2);
+
+            document.getElementById('val_start_all').innerText = start_all;
+            document.getElementById('val_end_all').innerText = end_all;
+            document.getElementById('res_all').innerText = use_all.toFixed(2);
+
+            document.getElementById('val_start_stm').innerText = start_stm;
+            document.getElementById('val_end_stm').innerText = end_stm;
+            document.getElementById('res_steam').innerText = use_stm.toFixed(2);
+
+            // Đổ dữ liệu chênh lệch
+            document.getElementById('sum_2_lines').innerText = sum_2_lines.toFixed(2);
+            let elChenhLech = document.getElementById('res_chenh_lech');
+            elChenhLech.innerText = chenh_lech.toFixed(2);
+            
+            // Tô màu kết quả lệch
+            if (chenh_lech > 0) {
+                elChenhLech.className = "font-bold text-sm text-amber-600";
+            } else if (chenh_lech < 0) {
+                elChenhLech.className = "font-bold text-sm text-red-600";
+            } else {
+                elChenhLech.className = "font-bold text-sm text-emerald-600";
+            }
+
+            document.getElementById('resultBox').classList.remove('hidden');
+        }
+
+        function lamMoi() {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => input.value = '');
+            document.getElementById('resultBox').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
